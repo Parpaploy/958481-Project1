@@ -118,4 +118,3 @@ class Sprite{
 		return dist<radius;
 	}
 }
-
