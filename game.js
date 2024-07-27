@@ -46,6 +46,12 @@ class Game{
 			loop: false,
 			volume: 0.3
 		});
+		this.bombSfx = new SFX({
+			context: this.audioContext,
+			src:{mp3:"bombSFX.mp3", webm:"bombSFX.webm"},
+			loop: false,
+			volume: 0.3
+		});
 		
 		const game = this;
 		console.log(game);
@@ -208,11 +214,18 @@ class Game{
 				this.msgPanel.index = 3;
 				dt = 0;
 				break;
+			case "instructions3":
+				this.msgPanel.index = 3;
+				dt = 0;
+				break;
+			case "instructions4":
+				this.msgPanel.index = 3;
+				dt = 0;
+				break;
 			case "gameover":
 				this.msgPanel.index = 3;
 				dt = 0;
 				break;
-
 		}
 		
 		for(let sprite of this.sprites){
@@ -320,6 +333,7 @@ class Game{
 				this.context.fillText("Use mouse to collect the Jeweries.", this.canvas.width / 2, this.canvas.height / 2 - 30);
 				this.context.fillText("The aim is to collect the Jeweries", this.canvas.width / 2, this.canvas.height / 2 + 10);
 				this.context.fillText("to get score and avoid tapping the bombs", this.canvas.width / 2, this.canvas.height / 2 + 50);
+				this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
 			case "instructions2":
 				this.msgPanel.update();
@@ -334,6 +348,29 @@ class Game{
 				this.context.fillText("Blue: +3", this.canvas.width / 2, this.canvas.height / 2 + 20);
 				this.context.fillText("Rainbow: +5", this.canvas.width / 2, this.canvas.height / 2 + 60);
 				this.context.fillText("Bomb: -2", this.canvas.width / 2, this.canvas.height / 2 + 100);
+				this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
+				break;
+			case "instructions3":
+				this.msgPanel.update();
+				this.msgPanel.render();
+
+				this.context.font = this.font;
+				this.context.textAlign = "center";
+				this.context.fillStyle = "white";
+				this.context.fillText("If you collect 7 or more Jeweries in one time", this.canvas.width / 2, this.canvas.height / 2 - 20);
+				this.context.fillText("All the bombs will be removed", this.canvas.width / 2, this.canvas.height / 2 + 10);
+				this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
+				break;
+			case "instructions4":
+				this.msgPanel.update();
+				this.msgPanel.render();
+
+				this.context.font = this.font;
+				this.context.textAlign = "center";
+				this.context.fillStyle = "white";
+				this.context.fillText("If you collect 3 times it will be", this.canvas.width / 2, this.canvas.height / 2 - 30);
+				this.context.fillText("GAME OVER!", this.canvas.width / 2, this.canvas.height / 2 + 30);
+				this.context.fillText("Tap to Start", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
 			case "gameover":
 				this.msgPanel.update();
@@ -343,6 +380,7 @@ class Game{
 				this.context.textAlign = "center";
 				this.context.fillStyle = "white";
 				this.context.fillText("Game Over", this.canvas.width / 2, this.canvas.height / 2);
+				this.context.fillText("Tap to Restart", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
 		}
 
@@ -392,7 +430,7 @@ class Game{
         };
     }
 	
-	  getConnectedSprites(index, row, col, connected = []) {
+	getConnectedSprites(index, row, col, connected = []) {
 		const sprite = this.flowers[row][col];
 		const grid = this.flowers;
 	
@@ -428,80 +466,60 @@ class Game{
 		}
 	}
 	
-	tap (evt) {
+	tap(evt) {
 		evt.preventDefault();
 		switch (this.state) {
 			case "instructions1":
 				this.state = "instructions2";
 				break;
 			case "instructions2":
-				this.state = "spawning";
+				this.state = "instructions3";
+				break;
+			case "instructions3":
+				this.state = "instructions4";	
+				break;
+			case "instructions4":
+				this.state = "spawning";	
 				break;
 			case "gameover":
 				this.restart();
 				break;
 		}
-
-		if (this.state!="ready") return;
-
+	
+		if (this.state != "ready") return;
+	
 		const mousePos = this.getMousePos(evt);
 		const canvasScale = this.canvas.width / this.canvas.offsetWidth;
 		const loc = {};
-
+	
 		loc.x = mousePos.x * canvasScale;
 		loc.y = mousePos.y * canvasScale;
-
+	
 		for (let sprite of this.sprites) {
-			if (sprite.hitTest(loc)){
-			//Need to find this sprite in the flowers grid
-			let row, col, found=false;
-			//First put flags to show if they have been checked
-			for(let sprite of this.sprites) sprite.checked = false;
-			let i=0;
-			for(row of this.flowers){
-				col = row.indexOf(sprite);
-				if (col!=-1){
-				//Found it
-				row = i;
-				found=true;
-				break;
-			}
-			i++;
-		}
-		if (found){
-			const connected = this.getConnectedSprites(sprite.index, row, col);
-			if (connected.length >= 3){
-				this.correctSfx.play();
-				for(let sprite of connected){
-					sprite.state = sprite.states.die;
+			if (sprite.hitTest(loc)) {
+				let found = false;
+				let row, col;
+	
+				for (let r = 0; r < this.flowers.length; r++) {
+					let c = this.flowers[r].indexOf(sprite);
+					if (c !== -1) {
+						row = r;
+						col = c;
+						found = true;
+						break;
+					}
 				}
-			// Purple
-			if(sprite.index == 0){
-				this.score += (connected.length) * 2;
-			}
-			// Green
-			else if(sprite.index == 1){
-				this.score += (connected.length) * 1;
-			}
-			// Rainbow
-			else if(sprite.index == 2){
-				this.score += (connected.length) * 5;
-			}
-			// Bomb
-			else if(sprite.index == 3){
-				this.score += (connected.length) * -2;
-				this.life -= 1;
-			}
-			// Blue
-			else if(sprite.index == 4){
-				this.score += (connected.length) * 3;
-			}
-
-			//this.score += connected.length;
-			this.state = "removing";
-			this.removeInfo = { count:0, total:connected.length };
-		}else{
-			this.wrongSfx.play();
+	
+				if (found) {
+					const connected = this.getConnectedSprites(sprite.index, row, col);
+					if (connected.length >= 3) {
+						if (connected.length >= 7 && sprite.index != 3) {
+							this.removeAllBombsAndConnected(connected, sprite);
+						} else {
+							this.handleConnectedSprites(connected, sprite);
+						}
+					} else {
+						this.wrongSfx.play();
 					}
 				}
 			}
@@ -511,12 +529,91 @@ class Game{
 	restart(){
 		this.score = 0;
 		this.life = 3;
+	
+		this.sprites = [];
+		this.flowers = [];
+	
 		this.state = "ready";
+		this.sinceLastSpawn = 0;
+	
+		const topleft = { x: 100, y: 40 };
+		for(let row = 0; row < this.gridSize.rows; row++) {
+			let y = row * this.gridSize.height + topleft.y;
+			this.flowers.push([]);
+			for(let col = 0; col < this.gridSize.cols; col++) {
+				let x = col * this.gridSize.width + topleft.x;
+				const sprite = this.spawn(x, y);
+				this.flowers[row].push(sprite);
+			}
+		}
+	
+		this.spawnInfo = { count: 0, total: this.gridSize.rows * this.gridSize.cols };
+	
 		this.refresh();
 	}
+
+	removeAllBombsAndConnected(connected, sprite) {
+		let bombSprites = [];
+	
+		// Collect all bomb sprites
+		for (let row = 0; row < this.flowers.length; row++) {
+			for (let col = 0; col < this.flowers[row].length; col++) {
+				if (this.flowers[row][col] && this.flowers[row][col].index == 3) {
+					bombSprites.push(this.flowers[row][col]);
+				}
+			}
+		}
+	
+		// Combine connected sprites and bomb sprites
+		let allSpritesToRemove = [...connected, ...bombSprites];
+	
+		// Remove all combined sprites
+		for (let s of allSpritesToRemove) {
+			s.state = s.states.die;
+		}
+	
+		// Update score based on sprite index for the connected sprites
+		switch (sprite.index) {
+			//Puple
+			case 0: this.score += (connected.length) * 2; break;
+			case 1: this.score += (connected.length) * 1; break;
+			case 2: this.score += (connected.length) * 5; break;
+			//Bomb
+			case 3: this.score += (connected.length) * -2; 
+					this.life -= 1; 
+					break;
+			case 4: this.score += (connected.length) * 3; break;
+		}
+	
+		// Normalize spawning
+		this.state = "removing";
+		this.removeInfo = { count: 0, total: allSpritesToRemove.length };
+		this.dropSfx.play();
+	}
+	
+	handleConnectedSprites(connected, sprite) {
+		if (sprite.index != 3) {
+			this.correctSfx.play();
+		} else {
+			this.bombSfx.play();
+		}
+	
+		for (let s of connected) {
+			s.state = s.states.die;
+		}
+	
+		// Update score based on sprite index
+		switch (sprite.index) {
+			case 0: this.score += (connected.length) * 2; break;
+			case 1: this.score += (connected.length) * 1; break;
+			case 2: this.score += (connected.length) * 5; break;
+			case 3: this.score += (connected.length) * -2; 
+					this.life -= 1; 
+					break;
+			case 4: this.score += (connected.length) * 3; break;
+		}
+	
+		this.state = "removing";
+		this.removeInfo = { count: 0, total: connected.length };
+	}	
 }
-
-
-
-
-
