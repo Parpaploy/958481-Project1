@@ -10,6 +10,9 @@ class Game{
 
 		this.life = 3;
 
+		this.initialTime = 60; // Countdown time in seconds
+        this.currentTime = this.initialTime;
+
 		this.spriteData;
 		this.spriteImage;
 		this.flowers = [];
@@ -100,50 +103,53 @@ class Game{
 		xobj.send(null);  
 	}
 	
-	init(){
+	init() {
 		const fps = 25;
-		this.config = {};
-		this.config.speed = 80;//Starting speed of icebergs, pixel travel per second
-		this.config.duration = 2000;//Game duration in milliseconds
-		this.config.lives = 9;
-		this.config.levels = 1;
-		this.lives = this.config.lives;
-
+        this.config = {};
+        this.config.speed = 80;
+        this.config.duration = 2000; // Game duration in milliseconds
+        this.config.lives = 9;
+        this.config.levels = 1;
+        this.lives = this.config.lives;
+        this.startTime = Date.now();
+        this.gameDuration = this.initialTime * 1000; // Convert seconds to milliseconds
+        this.startCount = false;
+        this.state = "initialised";
+	
 		const sourceSize = this.spriteData.frames[0].sourceSize;
-		this.gridSize = { rows:9, cols:10, width:sourceSize.w, height:sourceSize.h };
-		const topleft = { x:100, y:40 };
-		this.spawnInfo = { count:0, total: 0 }
+		this.gridSize = { rows: 9, cols: 10, width: sourceSize.w, height: sourceSize.h };
+		const topleft = { x: 100, y: 40 };
+		this.spawnInfo = { count: 0, total: 0 }
 		this.flowers = [];
-		for(let row=0; row<this.gridSize.rows; row++){
-			let y = row*this.gridSize.height + topleft.y;
+		for (let row = 0; row < this.gridSize.rows; row++) {
+			let y = row * this.gridSize.height + topleft.y;
 			this.flowers.push([]);
-			for(let col=0; col<this.gridSize.cols; col++){
+			for (let col = 0; col < this.gridSize.cols; col++) {
 				let x = col * this.gridSize.width + topleft.x;
-				const sprite = this.spawn(x,y);
+				const sprite = this.spawn(x, y);
 				this.flowers[row].push(sprite)
 				this.spawnInfo.total++;
 			}
 		}
 		this.gridSize.topleft = topleft;
-
+	
 		const msgoptions = {
 			game: this,
 			frame: "Rainbow",
 			center: true,
 			scale: 8.0,
 		}
-		//Message panel - msg_panel000x.png 1-3
+		// Message panel - msg_panel000x.png 1-3
 		this.msgPanel = new Sprite2("msgPanel", msgoptions);
-
+	
 		const game = this;
-		if ('ontouchstart' in window){
-			this.canvas.addEventListener("touchstart", function(event){ game.tap(event); });
-		}else{
-			this.canvas.addEventListener("mousedown", function(event){ game.tap(event); });
+		if ('ontouchstart' in window) {
+			this.canvas.addEventListener("touchstart", function (event) { game.tap(event); });
+		} else {
+			this.canvas.addEventListener("mousedown", function (event) { game.tap(event); });
 		}
-		//this.state = "spawning";
 		this.state = "initialised";
-
+	
 		this.refresh();
 	}
 	
@@ -160,13 +166,13 @@ class Game{
 		requestAnimationFrame(function(){ game.refresh(); });
 	};
 	
-	update(dt){
+	update(dt) {
 		let removed;
-		do{
+		do {
 			removed = false;
-			let i=0;
-			for(let sprite of this.sprites){
-				if (sprite.kill){
+			let i = 0;
+			for (let sprite of this.sprites) {
+				if (sprite.kill) {
 					this.sprites.splice(i, 1);
 					this.clearGrid(sprite);
 					removed = true;
@@ -174,21 +180,31 @@ class Game{
 				}
 				i++;
 			}
-		}while(removed);
-
-		if (this.life <= 0){
+		} while (removed);
+	
+		if (this.life <= 0) {
 			this.state = "gameover";
 		}
-		
-		switch(this.state){
+	
+		// Timer
+		if (this.startCount) {
+			const elapsedTime = Date.now() - this.startTime;
+			this.currentTime = Math.max(0, this.initialTime - Math.floor(elapsedTime / 1000));
+			if (this.currentTime <= 0) {
+				this.state = "gameover";
+				this.startCount = false;
+			}
+		}
+	
+		switch (this.state) {
 			case "spawning":
-				if (this.spawnInfo.count == this.spawnInfo.total){
+				if (this.spawnInfo.count == this.spawnInfo.total) {
 					delete this.spawnInfo;
 					this.state = "ready";
 				}
 				break;
 			case "removing":
-				if (this.removeInfo.count == this.removeInfo.total){
+				if (this.removeInfo.count == this.removeInfo.total) {
 					delete this.removeInfo;
 					this.removeGridGaps();
 					this.state = "dropping";
@@ -196,7 +212,7 @@ class Game{
 				}
 				break;
 			case "dropping":
-				if (this.dropInfo.count == this.dropInfo.total){
+				if (this.dropInfo.count == this.dropInfo.total) {
 					delete this.dropInfo;
 					this.state = "ready";
 				}
@@ -204,39 +220,50 @@ class Game{
 			case "initialised":
 				this.msgPanel.index = 3;
 				dt = 0;
-				this.state = "instructions1";					
+				this.state = "instructions1";
+				this.startCount = false;
 				break;
 			case "instructions1":
 				this.msgPanel.index = 3;
 				dt = 0;
+				this.startCount = false;
 				break;
 			case "instructions2":
 				this.msgPanel.index = 3;
 				dt = 0;
+				this.startCount = false;
 				break;
 			case "instructions3":
 				this.msgPanel.index = 3;
 				dt = 0;
+				this.startCount = false;
 				break;
 			case "instructions4":
 				this.msgPanel.index = 3;
 				dt = 0;
+				this.startCount = false;
 				break;
 			case "gameover":
 				this.msgPanel.index = 3;
 				dt = 0;
+				this.startCount = false;
 				break;
 		}
-
-		if(this.score <= 0){
+	
+		if (this.state == "ready") {
+			this.startCount == true;
+		}
+	
+		if (this.score <= 0) {
 			this.score = 0;
 		}
-		
-		for(let sprite of this.sprites){
-			if (sprite==null) continue;
+	
+		for (let sprite of this.sprites) {
+			if (sprite == null) continue;
 			sprite.update(dt);
 		}
 	}
+	
 	
 	clearGrid(sprite){
 		for(let row of this.flowers){
@@ -372,8 +399,9 @@ class Game{
 				this.context.font = this.font;
 				this.context.textAlign = "center";
 				this.context.fillStyle = "white";
-				this.context.fillText("If you collect 3 times it will be", this.canvas.width / 2, this.canvas.height / 2 - 30);
-				this.context.fillText("GAME OVER!", this.canvas.width / 2, this.canvas.height / 2 + 30);
+				this.context.fillText("If you collect 3 times", this.canvas.width / 2, this.canvas.height / 2 - 30);
+				this.context.fillText("or The time is out it will be", this.canvas.width / 2, this.canvas.height / 2 + 5);
+				this.context.fillText("GAME OVER!", this.canvas.width / 2, this.canvas.height / 2 + 40);
 				this.context.fillText("Tap to Start", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
 			case "gameover":
@@ -392,36 +420,53 @@ class Game{
 		for(let sprite of this.sprites) sprite.render();
 		}
 		
-		if(this.state !== "initialised" || this.state !== "instructor1" || this.state !== "instructor2"){
-		this.context.font="20px Verdana";
-		this.context.fillStyle = "#999";
-		let str = "Score";
-		let txt = this.context.measureText(str);
-		let left = (this.gridSize.topleft.x - 32 - txt.width)/2;
-		this.context.fillText("Score", left + 30, 30);
+		if (this.state !== "gameover") {
+            // Score Display
+            this.context.font = "20px Verdana";
+            this.context.fillStyle = "#999";
+            let str = "Score";
+            let txt = this.context.measureText(str);
+            let left = (this.gridSize.topleft.x - 32 - txt.width) / 2;
+            this.context.fillText("Score", left + 30, 30);
 
-		this.context.font="30px Verdana";
-		this.context.fillStyle = "#333";
-		str = String(this.score);
-		txt = this.context.measureText(str);
-		left = (this.gridSize.topleft.x + 25 - txt.width)/2;
-		this.context.fillText(this.score, left, 65);
+            this.context.font = "30px Verdana";
+            this.context.fillStyle = "#333";
+            str = String(this.score);
+            txt = this.context.measureText(str);
+            left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
+            this.context.fillText(this.score, left, 65);
 
-		this.context.font="22px Verdana";
-		this.context.fillStyle = "#999";
-		str = "Life";
-		txt = this.context.measureText(str);
-		left = (this.gridSize.topleft.x - 10 - txt.width)/2;
-		this.context.fillText("Life", left, 100);
+            // Life Display
+            this.context.font = "22px Verdana";
+            this.context.fillStyle = "#999";
+            str = "Life";
+            txt = this.context.measureText(str);
+            left = (this.gridSize.topleft.x - 10 - txt.width) / 2;
+            this.context.fillText("Life", left, 100);
 
-		this.context.font="25px Verdana";
-		this.context.fillStyle = "#333";
-		str = String(this.life);
-		txt = this.context.measureText(str);
-		left = (this.gridSize.topleft.x + 25 - txt.width)/2;
-		this.context.fillText(this.life, left - 30, 135);
-		}
-	}
+            this.context.font = "25px Verdana";
+            this.context.fillStyle = "#333";
+            str = String(this.life);
+            txt = this.context.measureText(str);
+            left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
+            this.context.fillText(this.life, left - 30, 135);
+
+            // Time Display
+            this.context.font = "22px Verdana";
+            this.context.fillStyle = "#999";
+            str = "Time";
+            txt = this.context.measureText(str);
+            left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
+            this.context.fillText("Time", left, 170);
+
+            this.context.font = "25px Verdana";
+            this.context.fillStyle = "#333";
+            str = String(this.currentTime);
+            txt = this.context.measureText(str);
+            left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
+            this.context.fillText(this.currentTime, left - 13, 205);
+        }
+    }
 	
 	getMousePos(evt) {
         const rect = this.canvas.getBoundingClientRect();
@@ -484,6 +529,7 @@ class Game{
 				break;
 			case "instructions4":
 				this.state = "spawning";	
+				this.startCount = true;
 				break;
 			case "gameover":
 				this.restart();
@@ -523,7 +569,9 @@ class Game{
 							this.handleConnectedSprites(connected, sprite);
 						}
 					} else {
+						this.score += (connected.length) * -2;
 						this.wrongSfx.play();
+						this.currentTime = Math.max(0, this.currentTime - 3);
 					}
 				}
 			}
@@ -533,18 +581,22 @@ class Game{
 	restart(){
 		this.score = 0;
 		this.life = 3;
-	
 		this.sprites = [];
 		this.flowers = [];
-	
+		
 		this.state = "ready";
 		this.sinceLastSpawn = 0;
+		this.startCount = true;
+		
+		// Reset game timer
+		this.startTime = Date.now();
+		this.currentTime = 0;
 	
 		const topleft = { x: 100, y: 40 };
-		for(let row = 0; row < this.gridSize.rows; row++) {
+		for (let row = 0; row < this.gridSize.rows; row++) {
 			let y = row * this.gridSize.height + topleft.y;
 			this.flowers.push([]);
-			for(let col = 0; col < this.gridSize.cols; col++) {
+			for (let col = 0; col < this.gridSize.cols; col++) {
 				let x = col * this.gridSize.width + topleft.x;
 				const sprite = this.spawn(x, y);
 				this.flowers[row].push(sprite);
@@ -555,6 +607,7 @@ class Game{
 	
 		this.refresh();
 	}
+	
 
 	removeAllBombsAndConnected(connected, sprite) {
 		let bombSprites = [];
@@ -578,14 +631,17 @@ class Game{
 	
 		// Update score based on sprite index for the connected sprites
 		switch (sprite.index) {
-			//Purple
 			case 0: this.score += (connected.length) * 2; break;
 			case 1: this.score += (connected.length) * 1; break;
 			case 2: this.score += (connected.length) * 5; break;
-			//Bomb
-			case 3: this.score += (connected.length) * -5; 
-					this.life -= 1; 
-					break;
+			case 3: 
+				this.score += (connected.length) * -5; 
+				this.life -= 1; 
+				console.log(`Bomb hit! Life reduced to ${this.life}`);
+				// Reduce time by 5 seconds
+				this.currentTime = Math.max(0, this.currentTime - 5);
+				console.log(`Time reduced to ${this.currentTime}`);
+				break;
 			case 4: this.score += (connected.length) * 3; break;
 		}
 	
@@ -593,13 +649,15 @@ class Game{
 		this.state = "removing";
 		this.removeInfo = { count: 0, total: allSpritesToRemove.length };
 		this.dropSfx.play();
-	}
+	}	
 	
 	handleConnectedSprites(connected, sprite) {
 		if (sprite.index != 3) {
 			this.correctSfx.play();
 		} else {
 			this.bombSfx.play();
+			// Reduce time by 5 seconds
+			this.currentTime = Math.max(0, this.currentTime - 5);
 		}
 	
 		for (let s of connected) {
@@ -611,8 +669,9 @@ class Game{
 			case 0: this.score += (connected.length) * 2; break;
 			case 1: this.score += (connected.length) * 1; break;
 			case 2: this.score += (connected.length) * 5; break;
-			case 3: this.score += (connected.length) * -5; 
-					this.life -= 1; 
+			case 3:	this.score += (connected.length) * -5;
+					this.life -= 1;
+					this.currentTime = Math.max(0, this.currentTime - 5);
 					break;
 			case 4: this.score += (connected.length) * 3; break;
 		}
