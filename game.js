@@ -76,7 +76,7 @@ class Game{
 
 	load(){
 		const game = this;
-		this.loadJSON("Jewery data", function(data, game){
+		this.loadJSON("Jewelry data", function(data, game){
 			game.spriteData = JSON.parse(data);
 			game.spriteImage = new Image();
 			game.spriteImage.src = game.spriteData.meta.image;
@@ -227,6 +227,10 @@ class Game{
 				dt = 0;
 				break;
 		}
+
+		if(this.score <= 0){
+			this.score = 0;
+		}
 		
 		for(let sprite of this.sprites){
 			if (sprite==null) continue;
@@ -330,8 +334,8 @@ class Game{
 				this.context.font = this.font;
 				this.context.textAlign = "center";
 				this.context.fillStyle = "white";
-				this.context.fillText("Use mouse to collect the Jeweries.", this.canvas.width / 2, this.canvas.height / 2 - 30);
-				this.context.fillText("The aim is to collect the Jeweries", this.canvas.width / 2, this.canvas.height / 2 + 10);
+				this.context.fillText("Use mouse to collect the Jewelries.", this.canvas.width / 2, this.canvas.height / 2 - 30);
+				this.context.fillText("The aim is to collect the Jewelries", this.canvas.width / 2, this.canvas.height / 2 + 10);
 				this.context.fillText("to get score and avoid tapping the bombs", this.canvas.width / 2, this.canvas.height / 2 + 50);
 				this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
@@ -342,7 +346,7 @@ class Game{
 				this.context.font = this.font;
 				this.context.textAlign = "center";
 				this.context.fillStyle = "white";
-				this.context.fillText("Each Jewery gives the different score:", this.canvas.width / 2, this.canvas.height / 2 - 100);
+				this.context.fillText("Each Jewelry gives the different score:", this.canvas.width / 2, this.canvas.height / 2 - 100);
 				this.context.fillText("Green: +1", this.canvas.width / 2, this.canvas.height / 2 - 60);
 				this.context.fillText("Purple: +2", this.canvas.width / 2, this.canvas.height / 2 - 20);
 				this.context.fillText("Blue: +3", this.canvas.width / 2, this.canvas.height / 2 + 20);
@@ -357,7 +361,7 @@ class Game{
 				this.context.font = this.font;
 				this.context.textAlign = "center";
 				this.context.fillStyle = "white";
-				this.context.fillText("If you collect 7 or more Jeweries in one time", this.canvas.width / 2, this.canvas.height / 2 - 20);
+				this.context.fillText("If you collect 7 or more Jewelries in one time", this.canvas.width / 2, this.canvas.height / 2 - 20);
 				this.context.fillText("All the bombs will be removed", this.canvas.width / 2, this.canvas.height / 2 + 10);
 				this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
@@ -574,12 +578,12 @@ class Game{
 	
 		// Update score based on sprite index for the connected sprites
 		switch (sprite.index) {
-			//Puple
+			//Purple
 			case 0: this.score += (connected.length) * 2; break;
 			case 1: this.score += (connected.length) * 1; break;
 			case 2: this.score += (connected.length) * 5; break;
 			//Bomb
-			case 3: this.score += (connected.length) * -2; 
+			case 3: this.score += (connected.length) * -5; 
 					this.life -= 1; 
 					break;
 			case 4: this.score += (connected.length) * 3; break;
@@ -607,7 +611,7 @@ class Game{
 			case 0: this.score += (connected.length) * 2; break;
 			case 1: this.score += (connected.length) * 1; break;
 			case 2: this.score += (connected.length) * 5; break;
-			case 3: this.score += (connected.length) * -2; 
+			case 3: this.score += (connected.length) * -5; 
 					this.life -= 1; 
 					break;
 			case 4: this.score += (connected.length) * 3; break;
