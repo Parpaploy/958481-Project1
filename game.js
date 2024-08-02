@@ -9,9 +9,15 @@ class Game{
 		this.score = 0;
 
 		this.life = 3;
+		this.level = 0;
+		this.coin = 0;
+		this.activeItem = false;
+		this.itemStartTime = 0;
 
 		this.initialTime = 60; // Countdown time in seconds
         this.currentTime = this.initialTime;
+		this.itemTime = 10;
+		this.currentItemTime = this.itemTime;
 
 		this.spriteData;
 		this.spriteImage;
@@ -57,7 +63,7 @@ class Game{
 		});
 		
 		const game = this;
-		console.log(game);
+		//console.log(game);
 		const options = {
 			assets:[
 				"beargame.json",
@@ -114,6 +120,9 @@ class Game{
         this.startTime = Date.now();
         this.gameDuration = this.initialTime * 1000; // Convert seconds to milliseconds
         this.startCount = false;
+
+		this.level = 0;
+		this.coin = 0;
         this.state = "initialised";
 	
 		const sourceSize = this.spriteData.frames[0].sourceSize;
@@ -149,6 +158,15 @@ class Game{
 			this.canvas.addEventListener("mousedown", function (event) { game.tap(event); });
 		}
 		this.state = "initialised";
+
+		const buyButton = document.getElementById("buyButton");
+		if (buyButton) {
+			buyButton.addEventListener("click", function () {
+				game.buyItem();
+			});
+		} else {
+    		console.error("Buy button not found");
+		}
 	
 		this.refresh();
 	}
@@ -194,6 +212,39 @@ class Game{
 				this.state = "gameover";
 				this.startCount = false;
 			}
+		}
+		
+		if (this.activeItem) {
+			if (this.itemStartTime === 0) {
+				this.itemStartTime = Date.now();
+			}
+			const elapsedTime = Date.now() - this.itemStartTime;
+			this.currentItemTime = Math.max(0, this.itemTime - Math.floor(elapsedTime / 1000));
+			if (this.currentItemTime <= 0) {
+				this.activeItem = false;
+				this.itemStartTime = 0;
+			}
+		}
+	
+		// Level Check
+		if (this.score >= 100) {
+			this.level = 1;
+		}
+		if (this.score >= 200) {
+			this.level = 2;
+		}
+		if (this.score >= 350) {
+			this.level = 3;
+		}
+		if (this.score >= 450) {
+			this.level = 4;
+		}
+		if (this.score >= 600) {
+			this.level = 5;
+		}
+	
+		if (this.level >= 5) {
+			this.state = "Victory";
 		}
 	
 		switch (this.state) {
@@ -243,7 +294,22 @@ class Game{
 				dt = 0;
 				this.startCount = false;
 				break;
+			case "instructions5":
+				this.msgPanel.index = 3;
+				dt = 0;
+				this.startCount = false;
+				break;
+			case "instructions6":
+				this.msgPanel.index = 3;
+				dt = 0;
+				this.startCount = false;
+				break;
 			case "gameover":
+				this.msgPanel.index = 3;
+				dt = 0;
+				this.startCount = false;
+				break;
+			case "Victory":
 				this.msgPanel.index = 3;
 				dt = 0;
 				this.startCount = false;
@@ -393,6 +459,22 @@ class Game{
 				this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
 			case "instructions4":
+					this.msgPanel.update();
+					this.msgPanel.render();
+	
+					this.context.font = this.font;
+					this.context.textAlign = "center";
+					this.context.fillStyle = "white";
+					this.context.fillText("The Goal is to Level up", this.canvas.width / 2, this.canvas.height / 2 - 110);
+					this.context.fillText("The score is the criterion for increasing the level:", this.canvas.width / 2, this.canvas.height / 2 - 70);
+					this.context.fillText("Level1: Score:100", this.canvas.width / 2, this.canvas.height / 2 - 30);
+					this.context.fillText("Level2: Score:200", this.canvas.width / 2, this.canvas.height / 2 + 10);
+					this.context.fillText("Level3: Score:350", this.canvas.width / 2, this.canvas.height / 2 + 50);
+					this.context.fillText("Level4: Score:450", this.canvas.width / 2, this.canvas.height / 2 + 90);
+					this.context.fillText("Level5: Score:600", this.canvas.width / 2, this.canvas.height / 2 + 130);
+					this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
+					break;
+			case "instructions5":
 				this.msgPanel.update();
 				this.msgPanel.render();
 
@@ -402,6 +484,18 @@ class Game{
 				this.context.fillText("If you collect 3 times", this.canvas.width / 2, this.canvas.height / 2 - 30);
 				this.context.fillText("or The time is out it will be", this.canvas.width / 2, this.canvas.height / 2 + 5);
 				this.context.fillText("GAME OVER!", this.canvas.width / 2, this.canvas.height / 2 + 40);
+				this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
+				break;
+			case "instructions6":
+				this.msgPanel.update();
+				this.msgPanel.render();
+
+				this.context.font = this.font;
+				this.context.textAlign = "center";
+				this.context.fillStyle = "white";
+				this.context.fillText("But if you reach level 5", this.canvas.width / 2, this.canvas.height / 2 - 30);
+				this.context.fillText("before the time is out", this.canvas.width / 2, this.canvas.height / 2 + 5);
+				this.context.fillText("VICTORY!", this.canvas.width / 2, this.canvas.height / 2 + 40);
 				this.context.fillText("Tap to Start", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
 			case "gameover":
@@ -414,6 +508,16 @@ class Game{
 				this.context.fillText("Game Over", this.canvas.width / 2, this.canvas.height / 2);
 				this.context.fillText("Tap to Restart", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
+			case "Victory":
+				this.msgPanel.update();
+				this.msgPanel.render();
+	
+				this.context.font = this.font;
+				this.context.textAlign = "center";
+				this.context.fillStyle = "white";
+				this.context.fillText("Victory", this.canvas.width / 2, this.canvas.height / 2);
+				this.context.fillText("Tap to Restart", this.canvas.width / 2, this.canvas.height / 2 + 200);
+				break;	
 		}
 
 		if(this.state != "gameover"){
@@ -465,6 +569,53 @@ class Game{
             txt = this.context.measureText(str);
             left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
             this.context.fillText(this.currentTime, left - 13, 205);
+
+			 // Level Display
+			 this.context.font = "22px Verdana";
+			 this.context.fillStyle = "#999";
+			 str = "Level";
+			 txt = this.context.measureText(str);
+			 left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
+			 this.context.fillText("Level", left, 240);
+ 
+			 this.context.font = "25px Verdana";
+			 this.context.fillStyle = "#333";
+			 str = String(this.currentTime);
+			 txt = this.context.measureText(str);
+			 left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
+			 this.context.fillText(this.level, left - 13, 275);
+
+			 // Coin Display
+			 this.context.font = "22px Verdana";
+			 this.context.fillStyle = "#999";
+			 str = "Coin";
+			 txt = this.context.measureText(str);
+			 left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
+			 this.context.fillText("Coin", left, 310);
+ 
+			 this.context.font = "25px Verdana";
+			 this.context.fillStyle = "#333";
+			 str = String(this.currentTime);
+			 txt = this.context.measureText(str);
+			 left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
+			 this.context.fillText(this.coin, left - 13, 345);
+
+			 // Item Time Display
+			 //if(this.activeItem == true){
+				this.context.font = "22px Verdana";
+				this.context.fillStyle = "#999";
+				str = "Bonus Time";
+				txt = this.context.measureText(str);
+				left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
+				this.context.fillText("Bonus Time", left, 380);
+	
+				this.context.font = "25px Verdana";
+				this.context.fillStyle = "#333";
+				str = String(this.currentTime);
+				txt = this.context.measureText(str);
+				left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
+				this.context.fillText(this.currentItemTime, left - 13, 415);
+			 //}
         }
     }
 	
@@ -506,7 +657,7 @@ class Game{
 			console.log(`Problem with ${row}, ${col}`);
 		}
 	
-		console.log(`getConnectedSprites ${row}, ${col}, ${connected.length}`);
+		//console.log(`getConnectedSprites ${row}, ${col}, ${connected.length}`);
 		return connected;
 	
 		function boundaryCheck(row, col) {
@@ -528,10 +679,19 @@ class Game{
 				this.state = "instructions4";	
 				break;
 			case "instructions4":
+				this.state = "instructions5";	
+				break;
+			case "instructions5":
+				this.state = "instructions6";	
+				break;
+			case "instructions6":
 				this.state = "spawning";	
 				this.startCount = true;
 				break;
 			case "gameover":
+				this.restart();
+				break;
+			case "Victory":
 				this.restart();
 				break;
 		}
@@ -544,7 +704,7 @@ class Game{
 	
 		loc.x = mousePos.x * canvasScale;
 		loc.y = mousePos.y * canvasScale;
-	
+
 		for (let sprite of this.sprites) {
 			if (sprite.hitTest(loc)) {
 				let found = false;
@@ -563,6 +723,9 @@ class Game{
 				if (found) {
 					const connected = this.getConnectedSprites(sprite.index, row, col);
 					if (connected.length >= 3) {
+						if (connected.length >= 5 && sprite.index != 3) {
+							this.coin += 1;
+						}
 						if (connected.length >= 7 && sprite.index != 3) {
 							this.removeAllBombsAndConnected(connected, sprite);
 						} else {
@@ -576,6 +739,8 @@ class Game{
 				}
 			}
 		}
+
+		//console.log(this.activeItem);
 	}
 
 	restart(){
@@ -587,6 +752,10 @@ class Game{
 		this.state = "ready";
 		this.sinceLastSpawn = 0;
 		this.startCount = true;
+
+		this.level = 0;
+		this.coin = 0;
+		this.activeItem = false;
 		
 		// Reset game timer
 		this.startTime = Date.now();
@@ -606,8 +775,7 @@ class Game{
 		this.spawnInfo = { count: 0, total: this.gridSize.rows * this.gridSize.cols };
 	
 		this.refresh();
-	}
-	
+	}	
 
 	removeAllBombsAndConnected(connected, sprite) {
 		let bombSprites = [];
@@ -629,20 +797,37 @@ class Game{
 			s.state = s.states.die;
 		}
 	
-		// Update score based on sprite index for the connected sprites
+		
 		switch (sprite.index) {
-			case 0: this.score += (connected.length) * 2; break;
-			case 1: this.score += (connected.length) * 1; break;
-			case 2: this.score += (connected.length) * 5; break;
-			case 3: 
-				this.score += (connected.length) * -5; 
-				this.life -= 1; 
-				console.log(`Bomb hit! Life reduced to ${this.life}`);
-				// Reduce time by 5 seconds
-				this.currentTime = Math.max(0, this.currentTime - 5);
-				console.log(`Time reduced to ${this.currentTime}`);
-				break;
-			case 4: this.score += (connected.length) * 3; break;
+			//Purple
+			case 0: if(this.activeItem == false){
+						this.score += (connected.length) * 2; break;
+					}else{
+						this.score += ((connected.length) * 2) * 5; break;
+					}
+			//Green
+			case 1: if(this.activeItem == false){
+						this.score += (connected.length) * 1; break;
+					}else{
+						this.score += ((connected.length) * 1) * 5; break;
+					}
+			//Rainbow
+			case 2: if(this.activeItem == false){
+						this.score += (connected.length) * 5; break;
+					}else{
+						this.score += ((connected.length) * 5) * 5; break;
+					}
+			//Bomb
+			case 3:	this.score += (connected.length) * -5;
+					this.life -= 1;
+					this.currentTime = Math.max(0, this.currentTime - 5);
+					break;
+			//Blue
+			case 4: if(this.activeItem == false){
+						this.score += (connected.length) * 3; break;
+					}else{
+						this.score += ((connected.length) * 3) * 5; break;
+					}
 		}
 	
 		// Normalize spawning
@@ -656,7 +841,6 @@ class Game{
 			this.correctSfx.play();
 		} else {
 			this.bombSfx.play();
-			// Reduce time by 5 seconds
 			this.currentTime = Math.max(0, this.currentTime - 5);
 		}
 	
@@ -664,19 +848,46 @@ class Game{
 			s.state = s.states.die;
 		}
 	
-		// Update score based on sprite index
 		switch (sprite.index) {
-			case 0: this.score += (connected.length) * 2; break;
-			case 1: this.score += (connected.length) * 1; break;
-			case 2: this.score += (connected.length) * 5; break;
+			//Purple
+			case 0: if(this.activeItem == false){
+						this.score += (connected.length) * 2; break;
+					}else{
+						this.score += ((connected.length) * 2) * 5; break;
+					}
+			//Green
+			case 1: if(this.activeItem == false){
+						this.score += (connected.length) * 1; break;
+					}else{
+						this.score += ((connected.length) * 1) * 5; break;
+					}
+			//Rainbow
+			case 2: if(this.activeItem == false){
+						this.score += (connected.length) * 5; break;
+					}else{
+						this.score += ((connected.length) * 5) * 5; break;
+					}
+			//Bomb
 			case 3:	this.score += (connected.length) * -5;
 					this.life -= 1;
 					this.currentTime = Math.max(0, this.currentTime - 5);
 					break;
-			case 4: this.score += (connected.length) * 3; break;
+			//Blue
+			case 4: if(this.activeItem == false){
+						this.score += (connected.length) * 3; break;
+					}else{
+						this.score += ((connected.length) * 3) * 5; break;
+					}
 		}
 	
 		this.state = "removing";
 		this.removeInfo = { count: 0, total: connected.length };
-	}	
+	}
+
+	buyItem(){
+		if(this.coin >= 7) { 
+			this.activeItem = true;
+			this.coin -= 7;
+		}
+	}
 }
