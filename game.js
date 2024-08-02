@@ -637,7 +637,7 @@ class Game{
 			 this.context.fillText(this.coin, left - 13, 345);
 
 			 // Item Time Display
-			 //if(this.activeItem == true){
+			 if(this.activeItem == true){
 				this.context.font = "22px monospace";
 				this.context.fillStyle = "#666";
 				str = "Bonus Time";
@@ -652,7 +652,7 @@ class Game{
 				txt = this.context.measureText(str);
 				left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
 				this.context.fillText(this.currentItemTime, left - 13, 440);
-			//}
+			}
         }
     }
 	
