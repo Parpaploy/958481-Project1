@@ -1,4 +1,3 @@
-/* A Sprite is an individual image from the spritesheet */
 class Sprite2 {
 				
 	constructor(name, options){

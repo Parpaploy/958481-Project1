@@ -1,4 +1,3 @@
-// JavaScript Document
 class Game{
 	constructor(){
 		this.canvas = document.getElementById("game");
@@ -58,6 +57,18 @@ class Game{
 		this.bombSfx = new SFX({
 			context: this.audioContext,
 			src:{mp3:"bombSFX.mp3", webm:"bombSFX.webm"},
+			loop: false,
+			volume: 0.3
+		});
+		this.coinSfx = new SFX({
+			context: this.audioContext,
+			src:{mp3:"coinSFX.mp3", webm:"coinSFX.webm"},
+			loop: false,
+			volume: 0.3
+		});
+		this.paySfx = new SFX({
+			context: this.audioContext,
+			src:{mp3:"paySFX.mp3", webm:"paySFX.webm"},
 			loop: false,
 			volume: 0.3
 		});
@@ -303,6 +314,13 @@ class Game{
 				this.msgPanel.index = 3;
 				dt = 0;
 				this.startCount = false;
+				this.startTime = Date.now();
+				break;
+			case "instructions7":
+				this.msgPanel.index = 3;
+				dt = 0;
+				this.startCount = false;
+				this.startTime = Date.now();
 				break;
 			case "gameover":
 				this.msgPanel.index = 3;
@@ -317,7 +335,7 @@ class Game{
 		}
 	
 		if (this.state == "ready") {
-			this.startCount == true;
+			this.startCount = true;
 		}
 	
 		if (this.score <= 0) {
@@ -427,7 +445,7 @@ class Game{
 				this.context.font = this.font;
 				this.context.textAlign = "center";
 				this.context.fillStyle = "white";
-				this.context.fillText("Use mouse to collect the Jewelries.", this.canvas.width / 2, this.canvas.height / 2 - 30);
+				this.context.fillText("Use mouse click to collect the Jewelries.", this.canvas.width / 2, this.canvas.height / 2 - 30);
 				this.context.fillText("The aim is to collect the Jewelries", this.canvas.width / 2, this.canvas.height / 2 + 10);
 				this.context.fillText("to get score and avoid tapping the bombs", this.canvas.width / 2, this.canvas.height / 2 + 50);
 				this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
@@ -454,11 +472,26 @@ class Game{
 				this.context.font = this.font;
 				this.context.textAlign = "center";
 				this.context.fillStyle = "white";
-				this.context.fillText("If you collect 7 or more Jewelries in one time", this.canvas.width / 2, this.canvas.height / 2 - 20);
-				this.context.fillText("All the bombs will be removed", this.canvas.width / 2, this.canvas.height / 2 + 10);
+				this.context.fillText("If you collect 4 or more", this.canvas.width / 2, this.canvas.height / 2 - 100);
+				this.context.fillText("Rainbow Jewelries in one time", this.canvas.width / 2, this.canvas.height / 2 - 60);
+				this.context.fillText("You will get 1 coin", this.canvas.width / 2, this.canvas.height / 2 - 20);
+				this.context.fillText("If you collect 7 coins", this.canvas.width / 2, this.canvas.height / 2 + 20);
+				this.context.fillText("You can buy an item that makes", this.canvas.width / 2, this.canvas.height / 2 + 60);
+				this.context.fillText("Each Jewelry's score increases 5 times", this.canvas.width / 2, this.canvas.height / 2 + 100);
 				this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
 			case "instructions4":
+				this.msgPanel.update();
+				this.msgPanel.render();
+
+				this.context.font = this.font;
+				this.context.textAlign = "center";
+				this.context.fillStyle = "white";
+				this.context.fillText("And if you collect 7 or more Jewelries in one time", this.canvas.width / 2, this.canvas.height / 2 - 20);
+				this.context.fillText("All the bombs will be removed", this.canvas.width / 2, this.canvas.height / 2 + 10);
+				this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
+				break;
+			case "instructions5":
 					this.msgPanel.update();
 					this.msgPanel.render();
 	
@@ -474,7 +507,7 @@ class Game{
 					this.context.fillText("Level5: Score:600", this.canvas.width / 2, this.canvas.height / 2 + 130);
 					this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
 					break;
-			case "instructions5":
+			case "instructions6":
 				this.msgPanel.update();
 				this.msgPanel.render();
 
@@ -486,7 +519,7 @@ class Game{
 				this.context.fillText("GAME OVER!", this.canvas.width / 2, this.canvas.height / 2 + 40);
 				this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
-			case "instructions6":
+			case "instructions7":
 				this.msgPanel.update();
 				this.msgPanel.render();
 
@@ -520,11 +553,11 @@ class Game{
 				break;	
 		}
 
-		if(this.state != "gameover"){
-		for(let sprite of this.sprites) sprite.render();
+		if (this.state != "gameover" && this.state != "Victory") {
+			for (let sprite of this.sprites) sprite.render();
 		}
 		
-		if (this.state !== "gameover") {
+		if (this.state !== "gameover" && this.state != "Victory") {
             // Score Display
             this.context.font = "20px Verdana";
             this.context.fillStyle = "#999";
@@ -601,21 +634,22 @@ class Game{
 			 this.context.fillText(this.coin, left - 13, 345);
 
 			 // Item Time Display
-			 //if(this.activeItem == true){
+			 if(this.activeItem == true){
 				this.context.font = "22px Verdana";
 				this.context.fillStyle = "#999";
 				str = "Bonus Time";
 				txt = this.context.measureText(str);
 				left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
-				this.context.fillText("Bonus Time", left, 380);
+				this.context.fillText("Bonus", left + 40, 380);
+				this.context.fillText("Time", left + 40, 405);
 	
 				this.context.font = "25px Verdana";
 				this.context.fillStyle = "#333";
 				str = String(this.currentTime);
 				txt = this.context.measureText(str);
 				left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
-				this.context.fillText(this.currentItemTime, left - 13, 415);
-			 //}
+				this.context.fillText(this.currentItemTime, left - 13, 440);
+			}
         }
     }
 	
@@ -685,6 +719,9 @@ class Game{
 				this.state = "instructions6";	
 				break;
 			case "instructions6":
+				this.state = "instructions7";	
+				break;
+			case "instructions7":
 				this.state = "spawning";	
 				this.startCount = true;
 				break;
@@ -723,8 +760,9 @@ class Game{
 				if (found) {
 					const connected = this.getConnectedSprites(sprite.index, row, col);
 					if (connected.length >= 3) {
-						if (connected.length >= 5 && sprite.index != 3) {
+						if (connected.length >= 4 && sprite.index == 2) {
 							this.coin += 1;
+							this.coinSfx.play();
 						}
 						if (connected.length >= 7 && sprite.index != 3) {
 							this.removeAllBombsAndConnected(connected, sprite);
@@ -734,7 +772,9 @@ class Game{
 					} else {
 						this.score += (connected.length) * -2;
 						this.wrongSfx.play();
-						this.currentTime = Math.max(0, this.currentTime - 3);
+						// console.log("Current Time Before Update:", this.currentTime);
+						// this.currentTime = Math.max(0, this.currentTime - 3);
+						// console.log("Current Time After Update:", this.currentTime);
 					}
 				}
 			}
@@ -760,6 +800,7 @@ class Game{
 		// Reset game timer
 		this.startTime = Date.now();
 		this.currentTime = 0;
+		
 	
 		const topleft = { x: 100, y: 40 };
 		for (let row = 0; row < this.gridSize.rows; row++) {
@@ -820,7 +861,7 @@ class Game{
 			//Bomb
 			case 3:	this.score += (connected.length) * -5;
 					this.life -= 1;
-					this.currentTime = Math.max(0, this.currentTime - 5);
+					// this.currentTime = Math.max(0, this.currentTime - 5);
 					break;
 			//Blue
 			case 4: if(this.activeItem == false){
@@ -870,7 +911,7 @@ class Game{
 			//Bomb
 			case 3:	this.score += (connected.length) * -5;
 					this.life -= 1;
-					this.currentTime = Math.max(0, this.currentTime - 5);
+					// this.currentTime = Math.max(0, this.currentTime - 5);
 					break;
 			//Blue
 			case 4: if(this.activeItem == false){
@@ -888,6 +929,7 @@ class Game{
 		if(this.coin >= 7) { 
 			this.activeItem = true;
 			this.coin -= 7;
+			this.paySfx.play();
 		}
 	}
 }
