@@ -934,5 +934,8 @@ class Game{
 			this.coin -= 7;
 			this.paySfx.play();
 		}
+		else {
+			this.wrongSfx.play();
+		}
 	}
 }
