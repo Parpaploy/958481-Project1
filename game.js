@@ -475,7 +475,7 @@ class Game{
 				this.context.fillText("If you collect 4 or more", this.canvas.width / 2, this.canvas.height / 2 - 120);
 				this.context.fillText("Rainbow Jewelries in one time", this.canvas.width / 2, this.canvas.height / 2 - 80);
 				this.context.fillText("You will get 1 coin", this.canvas.width / 2, this.canvas.height / 2 - 40);
-				this.context.fillText("If you collect 7 coins", this.canvas.width / 2, this.canvas.height / 2);
+				this.context.fillText("If you collect 5 coins", this.canvas.width / 2, this.canvas.height / 2);
 				this.context.fillText("You can buy an item that makes", this.canvas.width / 2, this.canvas.height / 2 + 40);
 				this.context.fillText("Each Jewelry's score increases 5 times", this.canvas.width / 2, this.canvas.height / 2 + 80);
 				this.context.fillText("For 10 seconds!", this.canvas.width / 2, this.canvas.height / 2 + 120);
@@ -929,9 +929,9 @@ class Game{
 	}
 
 	buyItem(){
-		if(this.coin >= 7) { 
+		if(this.coin >= 5) { 
 			this.activeItem = true;
-			this.coin -= 7;
+			this.coin -= 5;
 			this.paySfx.play();
 		}
 		else {
