@@ -26,13 +26,13 @@ class Game{
 		this.ui = [];
 		this.level = 9;
 		this.debug = false;
-		this.font = '30px Verdana';
+		this.font = '20px monospace';
 		this.txtoptions = {
 			alignment: "center",
-			font: 'Verdana',
+			font: 'monospace',
 			fontSize: 12,
 			lineHeight: 15,
-			color: "#fff"
+			color: "#000"
 		}
 
 		this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -435,7 +435,7 @@ class Game{
 
 				this.context.font = this.font;
 				this.context.textAlign = "center";
-				this.context.fillStyle = "white";
+				this.context.fillStyle = "black";
 				this.context.fillText("Instructions: Tap to continue", this.canvas.width / 2, this.canvas.height / 2);
 				break;
 			case "instructions1":
@@ -444,10 +444,10 @@ class Game{
 
 				this.context.font = this.font;
 				this.context.textAlign = "center";
-				this.context.fillStyle = "white";
-				this.context.fillText("Use mouse click to collect the Jewelries.", this.canvas.width / 2, this.canvas.height / 2 - 30);
-				this.context.fillText("The aim is to collect the Jewelries", this.canvas.width / 2, this.canvas.height / 2 + 10);
-				this.context.fillText("to get score and avoid tapping the bombs", this.canvas.width / 2, this.canvas.height / 2 + 50);
+				this.context.fillStyle = "black";
+				this.context.fillText("Use mouse click to collect the Jewelries.", this.canvas.width / 2, this.canvas.height / 2 - 40);
+				this.context.fillText("The aim is to collect the Jewelries", this.canvas.width / 2, this.canvas.height / 2);
+				this.context.fillText("to get score and avoid tapping the bombs", this.canvas.width / 2, this.canvas.height / 2 + 40);
 				this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
 			case "instructions2":
@@ -456,7 +456,7 @@ class Game{
 
 				this.context.font = this.font;
 				this.context.textAlign = "center";
-				this.context.fillStyle = "white";
+				this.context.fillStyle = "black";
 				this.context.fillText("Each Jewelry gives the different score:", this.canvas.width / 2, this.canvas.height / 2 - 100);
 				this.context.fillText("Green: +1", this.canvas.width / 2, this.canvas.height / 2 - 60);
 				this.context.fillText("Purple: +2", this.canvas.width / 2, this.canvas.height / 2 - 20);
@@ -471,13 +471,14 @@ class Game{
 
 				this.context.font = this.font;
 				this.context.textAlign = "center";
-				this.context.fillStyle = "white";
-				this.context.fillText("If you collect 4 or more", this.canvas.width / 2, this.canvas.height / 2 - 100);
-				this.context.fillText("Rainbow Jewelries in one time", this.canvas.width / 2, this.canvas.height / 2 - 60);
-				this.context.fillText("You will get 1 coin", this.canvas.width / 2, this.canvas.height / 2 - 20);
-				this.context.fillText("If you collect 7 coins", this.canvas.width / 2, this.canvas.height / 2 + 20);
-				this.context.fillText("You can buy an item that makes", this.canvas.width / 2, this.canvas.height / 2 + 60);
-				this.context.fillText("Each Jewelry's score increases 5 times", this.canvas.width / 2, this.canvas.height / 2 + 100);
+				this.context.fillStyle = "black";
+				this.context.fillText("If you collect 4 or more", this.canvas.width / 2, this.canvas.height / 2 - 120);
+				this.context.fillText("Rainbow Jewelries in one time", this.canvas.width / 2, this.canvas.height / 2 - 80);
+				this.context.fillText("You will get 1 coin", this.canvas.width / 2, this.canvas.height / 2 - 40);
+				this.context.fillText("If you collect 7 coins", this.canvas.width / 2, this.canvas.height / 2);
+				this.context.fillText("You can buy an item that makes", this.canvas.width / 2, this.canvas.height / 2 + 40);
+				this.context.fillText("Each Jewelry's score increases 5 times", this.canvas.width / 2, this.canvas.height / 2 + 80);
+				this.context.fillText("For 10 seconds!", this.canvas.width / 2, this.canvas.height / 2 + 120);
 				this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
 			case "instructions4":
@@ -486,9 +487,10 @@ class Game{
 
 				this.context.font = this.font;
 				this.context.textAlign = "center";
-				this.context.fillStyle = "white";
-				this.context.fillText("And if you collect 7 or more Jewelries in one time", this.canvas.width / 2, this.canvas.height / 2 - 20);
-				this.context.fillText("All the bombs will be removed", this.canvas.width / 2, this.canvas.height / 2 + 10);
+				this.context.fillStyle = "black";
+				this.context.fillText("And if you collect 7 or more", this.canvas.width / 2, this.canvas.height / 2 - 40);
+				this.context.fillText("Jewelries in one time", this.canvas.width / 2, this.canvas.height / 2);
+				this.context.fillText("All the bombs will be removed", this.canvas.width / 2, this.canvas.height / 2 + 40);
 				this.context.fillText("Tap Anywhere", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
 			case "instructions5":
@@ -497,9 +499,10 @@ class Game{
 	
 					this.context.font = this.font;
 					this.context.textAlign = "center";
-					this.context.fillStyle = "white";
-					this.context.fillText("The Goal is to Level up", this.canvas.width / 2, this.canvas.height / 2 - 110);
-					this.context.fillText("The score is the criterion for increasing the level:", this.canvas.width / 2, this.canvas.height / 2 - 70);
+					this.context.fillStyle = "black";
+					this.context.fillText("The Goal is to Level up", this.canvas.width / 2, this.canvas.height / 2 - 150);
+					this.context.fillText("The score is the criterion", this.canvas.width / 2, this.canvas.height / 2 - 110);
+					this.context.fillText("For increasing the level:", this.canvas.width / 2, this.canvas.height / 2 - 70);
 					this.context.fillText("Level1: Score:100", this.canvas.width / 2, this.canvas.height / 2 - 30);
 					this.context.fillText("Level2: Score:200", this.canvas.width / 2, this.canvas.height / 2 + 10);
 					this.context.fillText("Level3: Score:350", this.canvas.width / 2, this.canvas.height / 2 + 50);
@@ -513,7 +516,7 @@ class Game{
 
 				this.context.font = this.font;
 				this.context.textAlign = "center";
-				this.context.fillStyle = "white";
+				this.context.fillStyle = "black";
 				this.context.fillText("If you collect 3 times", this.canvas.width / 2, this.canvas.height / 2 - 30);
 				this.context.fillText("or The time is out it will be", this.canvas.width / 2, this.canvas.height / 2 + 5);
 				this.context.fillText("GAME OVER!", this.canvas.width / 2, this.canvas.height / 2 + 40);
@@ -525,7 +528,7 @@ class Game{
 
 				this.context.font = this.font;
 				this.context.textAlign = "center";
-				this.context.fillStyle = "white";
+				this.context.fillStyle = "black";
 				this.context.fillText("But if you reach level 5", this.canvas.width / 2, this.canvas.height / 2 - 30);
 				this.context.fillText("before the time is out", this.canvas.width / 2, this.canvas.height / 2 + 5);
 				this.context.fillText("VICTORY!", this.canvas.width / 2, this.canvas.height / 2 + 40);
@@ -537,7 +540,7 @@ class Game{
 
 				this.context.font = this.font;
 				this.context.textAlign = "center";
-				this.context.fillStyle = "white";
+				this.context.fillStyle = "black";
 				this.context.fillText("Game Over", this.canvas.width / 2, this.canvas.height / 2);
 				this.context.fillText("Tap to Restart", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;
@@ -547,7 +550,7 @@ class Game{
 	
 				this.context.font = this.font;
 				this.context.textAlign = "center";
-				this.context.fillStyle = "white";
+				this.context.fillStyle = "black";
 				this.context.fillText("Victory", this.canvas.width / 2, this.canvas.height / 2);
 				this.context.fillText("Tap to Restart", this.canvas.width / 2, this.canvas.height / 2 + 200);
 				break;	
@@ -559,14 +562,14 @@ class Game{
 		
 		if (this.state !== "gameover" && this.state != "Victory") {
             // Score Display
-            this.context.font = "20px Verdana";
-            this.context.fillStyle = "#999";
+            this.context.font = "20px monospace";
+            this.context.fillStyle = "#666";
             let str = "Score";
             let txt = this.context.measureText(str);
             let left = (this.gridSize.topleft.x - 32 - txt.width) / 2;
             this.context.fillText("Score", left + 30, 30);
 
-            this.context.font = "30px Verdana";
+            this.context.font = "30px monospace";
             this.context.fillStyle = "#333";
             str = String(this.score);
             txt = this.context.measureText(str);
@@ -574,29 +577,29 @@ class Game{
             this.context.fillText(this.score, left, 65);
 
             // Life Display
-            this.context.font = "22px Verdana";
-            this.context.fillStyle = "#999";
+            this.context.font = "22px monospace";
+            this.context.fillStyle = "#666";
             str = "Life";
             txt = this.context.measureText(str);
             left = (this.gridSize.topleft.x - 10 - txt.width) / 2;
-            this.context.fillText("Life", left, 100);
+            this.context.fillText("Life", left + 15, 100);
 
-            this.context.font = "25px Verdana";
+            this.context.font = "25px monospace";
             this.context.fillStyle = "#333";
             str = String(this.life);
             txt = this.context.measureText(str);
             left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
-            this.context.fillText(this.life, left - 30, 135);
+            this.context.fillText(this.life, left - 20, 135);
 
             // Time Display
-            this.context.font = "22px Verdana";
-            this.context.fillStyle = "#999";
+            this.context.font = "22px monospace";
+            this.context.fillStyle = "#666";
             str = "Time";
             txt = this.context.measureText(str);
             left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
             this.context.fillText("Time", left, 170);
 
-            this.context.font = "25px Verdana";
+            this.context.font = "25px monospace";
             this.context.fillStyle = "#333";
             str = String(this.currentTime);
             txt = this.context.measureText(str);
@@ -604,14 +607,14 @@ class Game{
             this.context.fillText(this.currentTime, left - 13, 205);
 
 			 // Level Display
-			 this.context.font = "22px Verdana";
-			 this.context.fillStyle = "#999";
+			 this.context.font = "22px monospace";
+			 this.context.fillStyle = "#666";
 			 str = "Level";
 			 txt = this.context.measureText(str);
 			 left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
-			 this.context.fillText("Level", left, 240);
+			 this.context.fillText("Level", left + 7, 240);
  
-			 this.context.font = "25px Verdana";
+			 this.context.font = "25px monospace";
 			 this.context.fillStyle = "#333";
 			 str = String(this.currentTime);
 			 txt = this.context.measureText(str);
@@ -619,14 +622,14 @@ class Game{
 			 this.context.fillText(this.level, left - 13, 275);
 
 			 // Coin Display
-			 this.context.font = "22px Verdana";
-			 this.context.fillStyle = "#999";
+			 this.context.font = "22px monospace";
+			 this.context.fillStyle = "#666";
 			 str = "Coin";
 			 txt = this.context.measureText(str);
 			 left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
 			 this.context.fillText("Coin", left, 310);
  
-			 this.context.font = "25px Verdana";
+			 this.context.font = "25px monospace";
 			 this.context.fillStyle = "#333";
 			 str = String(this.currentTime);
 			 txt = this.context.measureText(str);
@@ -634,22 +637,22 @@ class Game{
 			 this.context.fillText(this.coin, left - 13, 345);
 
 			 // Item Time Display
-			 if(this.activeItem == true){
-				this.context.font = "22px Verdana";
-				this.context.fillStyle = "#999";
+			 //if(this.activeItem == true){
+				this.context.font = "22px monospace";
+				this.context.fillStyle = "#666";
 				str = "Bonus Time";
 				txt = this.context.measureText(str);
 				left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
 				this.context.fillText("Bonus", left + 40, 380);
 				this.context.fillText("Time", left + 40, 405);
 	
-				this.context.font = "25px Verdana";
+				this.context.font = "25px monospace";
 				this.context.fillStyle = "#333";
 				str = String(this.currentTime);
 				txt = this.context.measureText(str);
 				left = (this.gridSize.topleft.x + 25 - txt.width) / 2;
 				this.context.fillText(this.currentItemTime, left - 13, 440);
-			}
+			//}
         }
     }
 	
